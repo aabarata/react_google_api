@@ -1,24 +1,20 @@
 import React from 'react';
-import logo from './logo.svg';
+import MapWrapper from './components/map/map';
+import FormWrapper from './components/form/form';
+import 'materialize-css/dist/css/materialize.min.css';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="App">
+          <div className="row">
+              <div className="noPadding col s12 l6">
+                  <MapWrapper></MapWrapper>
+              </div>
+              <div className="col s12 l6">
+                  <FormWrapper></FormWrapper>
+              </div>
+          </div>
     </div>
   );
 }
