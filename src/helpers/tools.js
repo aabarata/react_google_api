@@ -1,8 +1,8 @@
 export function getSanitizedAddress(addressObject) {
     let sanitizedAddress = {
-        postal_code: undefined,
-        region: undefined,
-        country: undefined,
+        postal_code: '',
+        region: '',
+        country: '',
         lat: 0,
         lng: 0
     };
