@@ -1,9 +1,16 @@
 {
   "ExpandedNodes": [
     "",
+    "\\public",
+    "\\src",
     "\\src\\components",
-    "\\src\\helpers"
+    "\\src\\components\\map",
+    "\\src\\helpers",
+    "\\src\\state",
+    "\\src\\state\\reducers",
+    "\\src\\state\\sagas",
+    "\\src\\state\\selectors"
   ],
-  "SelectedNode": "\\src",
+  "SelectedNode": "\\src\\components\\form\\form.js",
   "PreviewInSolutionExplorer": false
 }

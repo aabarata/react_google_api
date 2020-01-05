@@ -1,1 +1,21 @@
+span.required {
+    font-size: 18px;
+    font-weight: 700;
+    color: #a62632;
+}
 
+.reset {
+    background-color: #a62632;
+}
+
+.reset:hover {
+    background-color: #bb2b38;
+}
+
+.reset:focus {
+    background-color: #7d1d26;
+}
+
+.form_footer {
+    margin-top: 20px;
+}
