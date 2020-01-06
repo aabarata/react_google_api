@@ -1,10 +1,7 @@
 import { SET_COORDINATES } from '../actions'
 
 const initialState = {
-    coordinates: {
-        lat: undefined,
-        lng: undefined
-    }
+    coordinates: undefined
 }
 
 const reducer = (state = initialState, action) => {

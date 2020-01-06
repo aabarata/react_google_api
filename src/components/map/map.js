@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Map, Marker } from 'google-maps-react';
 import { getCoordinates } from '../../state/selectors'
@@ -9,43 +9,40 @@ const INITIAL_COORDS = {
     lng: 2.347640
 };
 
-class MapWrapper extends Component {
-    constructor() {
-        super();
-        this.state = {
-            lat: INITIAL_COORDS.lat,
-            lng: INITIAL_COORDS.lng
-        }
-    }
-    componentDidMount() {
-        if (navigator.geolocation) {
-            const self = this;
-            navigator.geolocation.getCurrentPosition((position) => {
-                self.setState({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                });
-            });
-        }
-    }
-    render() {
-        return (
-            <div className="wrapper">
-                <Map
-                    google={this.props.google}
-                    zoom={this.props.coordinates.lat ? 16 : 10}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                    }}
-                    initialCenter={this.state}
-                    center={this.props.coordinates}
-                >
-                    <Marker position={this.props.coordinates} />
-                </Map>
-            </div>
-        );
-    }
+// Using react hooks
+ const MapWrapper = (props) => {
+    const [coordinates, setCoordinates] = useState({
+        lat: INITIAL_COORDS.lat,
+        lng: INITIAL_COORDS.lng
+    });
+     useEffect(() => {
+         if (navigator.geolocation) {
+             navigator.geolocation.getCurrentPosition((position) => {
+                 setCoordinates({
+                     lat: position.coords.latitude,
+                     lng: position.coords.longitude
+                 });
+             });
+         }
+     });
+    return (
+        <div className="wrapper">
+            <Map
+                google={props.google}
+                zoom={props.coordinates ? 16 : 10}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                }}
+                center={ props.coordinates ? props.coordinates : coordinates}
+            >
+                {
+                    props.coordinates ? (<Marker position={props.coordinates} />) : null
+                }
+            </Map>
+        </div>
+    );
+
 }
 
 export default connect(getCoordinates)(MapWrapper);

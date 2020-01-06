@@ -3,8 +3,8 @@ export function getSanitizedAddress(addressObject) {
         postal_code: '',
         region: '',
         country: '',
-        lat: 0,
-        lng: 0
+        lat: undefined,
+        lng: undefined
     };
     sanitizedAddress.lat = addressObject.geometry.location.lat();
     sanitizedAddress.lng = addressObject.geometry.location.lng();

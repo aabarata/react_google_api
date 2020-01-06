@@ -7,6 +7,12 @@ import { getSanitizedAddress } from '../../helpers/tools';
 import 'materialize-css/dist/css/materialize.min.css';
 import './form.css';
 
+const GEO_OPTIONS = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0
+};
+
 class FormWrapper extends Component {
     constructor() {
         super();
@@ -21,8 +27,11 @@ class FormWrapper extends Component {
                 region: '',
                 country: '',
             },
-            coordinates: {},
             hasGeoLocalization: false,
+            currentPosition: {
+                lat: undefined,
+                lng: undefined
+            }
         };
     }
     componentDidMount() {
@@ -47,13 +56,31 @@ class FormWrapper extends Component {
         // verify state of geolocation
         if (navigator.geolocation) {
             const self = this;
-            navigator.geolocation.getCurrentPosition(() => {
+            navigator.geolocation.getCurrentPosition((position) => {
                 self.setState({
-                    hasGeoLocalization: true
+                    hasGeoLocalization: true,
+                    currentPosition: {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    }
                 });
-            });
+            }, (error) => {
+                    console.log(error);
+                    notificationService.addNotification({
+                        title: "We are sorry :(",
+                        message: "Unfortunately, your position was not detected. Reason: " + error.message,
+                        type: "warning",
+                        insert: "top",
+                        container: "bottom-center",
+                        animationIn: ["animated", "fadeIn"],
+                        animationOut: ["animated", "fadeOut"],
+                        dismiss: {
+                            duration: 3000,
+                            onScreen: true
+                        }
+                    });
+            }, GEO_OPTIONS);
         }
-
     }
     handleInputChange(event) {
         this.setState({
@@ -76,6 +103,7 @@ class FormWrapper extends Component {
                     country: ''
                 }
             });
+            this.setCoordinates();
             // small trick to reboot google autocomplete
             const target = event.target;
             target.blur();
@@ -85,18 +113,14 @@ class FormWrapper extends Component {
         }
     }
     handleAutoPlaceSelect() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const { google } = this.props;
-                const latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                new google.maps.Geocoder().geocode({ 'latLng': latlng }, (results, status) => {
-                    if (status === 'OK') {
-                        const sanitizedAddress = getSanitizedAddress(results[0]);
-                        this.setAddressState(results[0].formatted_address, sanitizedAddress);
-                    }
-                })
-            });
-        }
+        const { google } = this.props;
+        const latlng = new google.maps.LatLng(this.state.currentPosition.lat, this.state.currentPosition.lng);
+        new google.maps.Geocoder().geocode({ 'latLng': latlng }, (results, status) => {
+            if (status === 'OK') {
+                const sanitizedAddress = getSanitizedAddress(results[0]);
+                this.setAddressState(results[0].formatted_address, sanitizedAddress);
+            }
+        });
     }
     handlePlaceSelect(autocomplete) {
         const addressObject = autocomplete.getPlace();
@@ -111,10 +135,12 @@ class FormWrapper extends Component {
                 postal_code: sanitizedAddress.postal_code,
                 region: sanitizedAddress.region,
                 country: sanitizedAddress.country
-            },
-            coordinates: { lat: sanitizedAddress.lat, lng: sanitizedAddress.lng }
+            }
         });
-        this.props.dispatch(setCoordinates(this.state.coordinates));
+        this.setCoordinates({ lat: sanitizedAddress.lat, lng: sanitizedAddress.lng });
+    }
+    setCoordinates(coordinates) {
+        this.props.dispatch(setCoordinates(coordinates));
     }
     handleResetForm() {
         this.setState({
@@ -127,10 +153,10 @@ class FormWrapper extends Component {
                 postal_code: '',
                 region: '',
                 country: '',
-            },
-            coordinates: {}
+            }
         });
         document.getElementById('start_date').value = '';
+        this.setCoordinates();
     }
     isFormValid() {
         const keys = Object.keys(this.state.form).filter(key => key !== 'postal_code' && key !== 'region');
@@ -139,8 +165,8 @@ class FormWrapper extends Component {
     }
     handleFormSubmit() {
         notificationService.addNotification({
-            title: "Bravo !",
-            message: "La campagne " + this.state.form.title + " a été bien créée",
+            title: "Congratulations !",
+            message: "The  campaign " + this.state.form.title + " was successfully created",
             type: "success",
             insert: "top",
             container: "bottom-center",
